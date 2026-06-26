@@ -9,9 +9,10 @@ export function BetaSignupForm() {
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const formElement = event.currentTarget;
     setLoading(true);
     setStatus(null);
-    const form = new FormData(event.currentTarget);
+    const form = new FormData(formElement);
     const payload = Object.fromEntries(form.entries());
     try {
       const response = await fetch("/api/website/beta-signup", {
@@ -23,7 +24,7 @@ export function BetaSignupForm() {
       const text = await response.text();
       const body = text ? (JSON.parse(text) as { message?: string }) : {};
       setStatus(body.message ?? (response.ok ? "Beta request logged." : "Beta request not accepted."));
-      if (response.ok) event.currentTarget.reset();
+      if (response.ok) formElement.reset();
     } catch (error) {
       setStatus(error instanceof Error ? `The beta channel did not answer: ${error.message}` : "The beta channel did not answer.");
     } finally {
