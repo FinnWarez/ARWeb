@@ -1,4 +1,5 @@
 import { AccountActions } from "@/components/account-actions";
+import { AccountSummary } from "@/components/account-summary";
 
 export const metadata = {
   title: "Account",
@@ -15,6 +16,9 @@ export default function AccountPage() {
       </p>
       <div className="mt-10">
         <AccountActions />
+      </div>
+      <div className="mt-6">
+        <AccountSummary />
       </div>
     </main>
   );
