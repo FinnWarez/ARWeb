@@ -23,11 +23,15 @@ export function PricingCards({ tiers }: { tiers: readonly Tier[] }) {
     setMessage(null);
     try {
       const accessToken = window.localStorage.getItem(siteConfig.accessTokenStorageKey);
+      if (!accessToken) {
+        setMessage("Enter the shared Ascent account before opening a credit gate.");
+        return;
+      }
       const response = await fetch("/api/payments/credit-checkout", {
         method: "POST",
         headers: {
           "content-type": "application/json",
-          ...(accessToken ? { authorization: `Bearer ${accessToken}` } : {}),
+          authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify({ sku }),
       });

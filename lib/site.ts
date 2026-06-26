@@ -5,8 +5,14 @@ export const siteConfig = {
     "A location-aware AR signal, chapter mission, and mirror-layer transmission system for players who notice the city answering back.",
   url: process.env.NEXT_PUBLIC_SITE_URL || "https://ascent.example",
   cognitoHostedUiUrl: process.env.NEXT_PUBLIC_COGNITO_HOSTED_UI_URL || "",
+  cognitoDomain: process.env.NEXT_PUBLIC_COGNITO_DOMAIN || "",
+  cognitoUserPoolClientId: process.env.NEXT_PUBLIC_COGNITO_USER_POOL_CLIENT_ID || "",
   appDownloadUrl: process.env.NEXT_PUBLIC_APP_DOWNLOAD_URL || "/beta",
   accessTokenStorageKey: process.env.NEXT_PUBLIC_ASCENT_ACCESS_TOKEN_STORAGE_KEY || "ascent.accessToken",
+  idTokenStorageKey: process.env.NEXT_PUBLIC_ASCENT_ID_TOKEN_STORAGE_KEY || "ascent.idToken",
+  tokenExpiryStorageKey: process.env.NEXT_PUBLIC_ASCENT_TOKEN_EXPIRY_STORAGE_KEY || "ascent.tokenExpiresAt",
+  pkceVerifierStorageKey: process.env.NEXT_PUBLIC_ASCENT_PKCE_VERIFIER_STORAGE_KEY || "ascent.pkceVerifier",
+  oauthStateStorageKey: process.env.NEXT_PUBLIC_ASCENT_OAUTH_STATE_STORAGE_KEY || "ascent.oauthState",
 };
 
 export const creditTiers = [
