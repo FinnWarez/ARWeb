@@ -17,13 +17,15 @@ export function MailingListForm() {
       const response = await fetch("/api/website/signup", {
         method: "POST",
         headers: { "content-type": "application/json" },
+        cache: "no-store",
         body: JSON.stringify(payload),
       });
-      const body = (await response.json()) as { message?: string };
+      const text = await response.text();
+      const body = text ? (JSON.parse(text) as { message?: string }) : {};
       setStatus(body.message ?? (response.ok ? "Signal received." : "Signal not accepted."));
       if (response.ok) event.currentTarget.reset();
-    } catch {
-      setStatus("The list is not listening right now.");
+    } catch (error) {
+      setStatus(error instanceof Error ? `The list is not listening right now: ${error.message}` : "The list is not listening right now.");
     } finally {
       setLoading(false);
     }
