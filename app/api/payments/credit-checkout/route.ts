@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { proxyToAscentAppSync } from "@/lib/backend";
+import { authorizationFromSession } from "@/lib/session";
 
 type CreditCheckoutData = {
   createCreditCheckoutSession?: {
@@ -19,7 +20,7 @@ const createCreditCheckoutMutation = /* GraphQL */ `
 
 export async function POST(request: Request) {
   const payload = await request.json();
-  const authorization = request.headers.get("authorization");
+  const authorization = authorizationFromSession(request);
   if (!authorization) {
     return NextResponse.json(
       {

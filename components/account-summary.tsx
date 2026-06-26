@@ -2,7 +2,6 @@
 
 import { Loader2, RefreshCw, WalletCards } from "lucide-react";
 import { useEffect, useState } from "react";
-import { siteConfig } from "@/lib/site";
 
 type WebsiteAccount = {
   profile?: {
@@ -38,21 +37,11 @@ export function AccountSummary() {
   const [message, setMessage] = useState<string | null>(null);
 
   async function refreshAccount() {
-    const accessToken = window.localStorage.getItem(siteConfig.accessTokenStorageKey);
-    if (!accessToken) {
-      setAccount(null);
-      setMessage("Enter the shared Ascent account to see credits and profile objects.");
-      return;
-    }
-
     setLoading(true);
     setMessage(null);
     try {
       const response = await fetch("/api/account", {
         method: "GET",
-        headers: {
-          authorization: `Bearer ${accessToken}`,
-        },
         cache: "no-store",
       });
       const body = (await response.json()) as AccountResponse;

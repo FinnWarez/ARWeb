@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { setAccessTokenCookie } from "@/lib/session";
 import { siteConfig } from "@/lib/site";
 
 type TokenRequest = {
@@ -38,6 +39,31 @@ export async function POST(request: Request) {
     );
   }
 
+  let redirectUrl: URL;
+  try {
+    redirectUrl = new URL(body.redirectUri);
+  } catch {
+    return NextResponse.json(
+      {
+        ok: false,
+        message: "The account callback URL is invalid.",
+      },
+      { status: 400 },
+    );
+  }
+  const requestOrigin = new URL(request.url).origin;
+  const configuredOrigin = process.env.NEXT_PUBLIC_SITE_URL ? new URL(process.env.NEXT_PUBLIC_SITE_URL).origin : requestOrigin;
+  const allowedOrigins = new Set([requestOrigin, configuredOrigin]);
+  if (!allowedOrigins.has(redirectUrl.origin) || redirectUrl.pathname !== "/auth/callback") {
+    return NextResponse.json(
+      {
+        ok: false,
+        message: "The account callback URL is not allowed.",
+      },
+      { status: 400 },
+    );
+  }
+
   const response = await fetch(`${baseUrl}/oauth2/token`, {
     method: "POST",
     headers: { "content-type": "application/x-www-form-urlencoded" },
@@ -69,14 +95,13 @@ export async function POST(request: Request) {
     );
   }
 
-  return NextResponse.json(
+  const result = NextResponse.json(
     {
       ok: true,
-      accessToken: tokenBody.access_token,
-      idToken: tokenBody.id_token,
-      tokenType: tokenBody.token_type,
       expiresIn: tokenBody.expires_in,
     },
     { status: 200 },
   );
+  setAccessTokenCookie(result, tokenBody.access_token, tokenBody.expires_in);
+  return result;
 }

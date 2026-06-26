@@ -2,7 +2,6 @@
 
 import { ArrowRight, Loader2 } from "lucide-react";
 import { useState } from "react";
-import { siteConfig } from "@/lib/site";
 
 type Tier = {
   sku: string;
@@ -22,16 +21,10 @@ export function PricingCards({ tiers }: { tiers: readonly Tier[] }) {
     setPendingSku(sku);
     setMessage(null);
     try {
-      const accessToken = window.localStorage.getItem(siteConfig.accessTokenStorageKey);
-      if (!accessToken) {
-        setMessage("Enter the shared Ascent account before opening a credit gate.");
-        return;
-      }
       const response = await fetch("/api/payments/credit-checkout", {
         method: "POST",
         headers: {
           "content-type": "application/json",
-          authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify({ sku }),
       });

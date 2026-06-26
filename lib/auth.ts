@@ -41,8 +41,8 @@ async function beginCognitoAuth(entryPath: "/oauth2/authorize" | "/signup") {
   const challenge = await sha256Base64Url(verifier);
   const state = randomBase64Url(32);
   const redirectUri = `${window.location.origin}/auth/callback`;
-  window.localStorage.setItem(siteConfig.pkceVerifierStorageKey, verifier);
-  window.localStorage.setItem(siteConfig.oauthStateStorageKey, state);
+  window.sessionStorage.setItem(siteConfig.pkceVerifierStorageKey, verifier);
+  window.sessionStorage.setItem(siteConfig.oauthStateStorageKey, state);
 
   const params = new URLSearchParams({
     client_id: siteConfig.cognitoUserPoolClientId,
@@ -65,22 +65,27 @@ export async function beginCognitoRegistration() {
 }
 
 export function clearStoredAuth() {
-  window.localStorage.removeItem(siteConfig.accessTokenStorageKey);
-  window.localStorage.removeItem(siteConfig.idTokenStorageKey);
-  window.localStorage.removeItem(siteConfig.tokenExpiryStorageKey);
+  window.sessionStorage.removeItem(siteConfig.pkceVerifierStorageKey);
+  window.sessionStorage.removeItem(siteConfig.oauthStateStorageKey);
+  // Clear legacy browser-token storage from earlier builds.
+  window.localStorage.removeItem("ascent.accessToken");
+  window.localStorage.removeItem("ascent.idToken");
+  window.localStorage.removeItem("ascent.tokenExpiresAt");
   window.localStorage.removeItem(siteConfig.pkceVerifierStorageKey);
   window.localStorage.removeItem(siteConfig.oauthStateStorageKey);
 }
 
-export function hasStoredAccessToken() {
-  const token = window.localStorage.getItem(siteConfig.accessTokenStorageKey);
-  const expiresAt = Number(window.localStorage.getItem(siteConfig.tokenExpiryStorageKey) ?? "0");
-  return Boolean(token && (!expiresAt || expiresAt > Date.now()));
+export async function hasActiveSession() {
+  const response = await fetch("/api/auth/session", { method: "GET", cache: "no-store" });
+  if (!response.ok) return false;
+  const body = (await response.json()) as { authenticated?: boolean };
+  return Boolean(body.authenticated);
 }
 
-export function beginCognitoSignOut() {
+export async function beginCognitoSignOut() {
   const baseUrl = cognitoBaseUrl();
   clearStoredAuth();
+  await fetch("/api/auth/session", { method: "DELETE", cache: "no-store" }).catch(() => null);
   if (!baseUrl || !siteConfig.cognitoUserPoolClientId) return;
 
   const params = new URLSearchParams({

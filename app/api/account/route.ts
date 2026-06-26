@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { proxyToAscentAppSync } from "@/lib/backend";
+import { authorizationFromSession } from "@/lib/session";
 
 type WebsiteAccountData = {
   getMyWebsiteAccount?: {
@@ -60,7 +61,7 @@ const getMyWebsiteAccountQuery = /* GraphQL */ `
 `;
 
 export async function GET(request: Request) {
-  const authorization = request.headers.get("authorization");
+  const authorization = authorizationFromSession(request);
   if (!authorization) {
     return NextResponse.json(
       {

@@ -7,8 +7,8 @@ import {
   beginCognitoRegistration,
   beginCognitoSignIn,
   beginCognitoSignOut,
+  hasActiveSession,
   hasAuthConfig,
-  hasStoredAccessToken,
 } from "@/lib/auth";
 import { siteConfig } from "@/lib/site";
 
@@ -18,7 +18,7 @@ export function AccountActions() {
   const [message, setMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    setSignedIn(hasStoredAccessToken());
+    hasActiveSession().then(setSignedIn).catch(() => setSignedIn(false));
   }, []);
 
   async function signIn() {
@@ -43,9 +43,9 @@ export function AccountActions() {
     }
   }
 
-  function signOut() {
+  async function signOut() {
     setPending("signout");
-    beginCognitoSignOut();
+    await beginCognitoSignOut();
     setSignedIn(false);
     setPending(null);
   }
@@ -57,7 +57,7 @@ export function AccountActions() {
         <h2 className="mt-5 font-display text-3xl text-white">{signedIn ? "Account linked" : "Create account"}</h2>
         <p className="mt-3 min-h-20 leading-7 text-signal-fog/72">
           {signedIn
-            ? "This browser is holding the account token used by credit gates."
+            ? "This browser has an active account session used by credit gates."
             : "Register the same Cognito-backed identity that signs into the phone build."}
         </p>
         <div className="mt-6 flex flex-wrap gap-3">

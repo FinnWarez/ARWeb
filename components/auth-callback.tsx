@@ -6,8 +6,7 @@ import { useEffect, useState } from "react";
 import { siteConfig } from "@/lib/site";
 
 type TokenResponse = {
-  accessToken?: string;
-  idToken?: string;
+  ok?: boolean;
   expiresIn?: number;
   message?: string;
 };
@@ -21,8 +20,8 @@ export function AuthCallback() {
     async function exchangeCode() {
       const code = searchParams.get("code");
       const state = searchParams.get("state");
-      const expectedState = window.localStorage.getItem(siteConfig.oauthStateStorageKey);
-      const codeVerifier = window.localStorage.getItem(siteConfig.pkceVerifierStorageKey);
+      const expectedState = window.sessionStorage.getItem(siteConfig.oauthStateStorageKey);
+      const codeVerifier = window.sessionStorage.getItem(siteConfig.pkceVerifierStorageKey);
 
       if (!code || !state || !expectedState || state !== expectedState || !codeVerifier) {
         setMessage("The account signal could not be verified. Start from the account page again.");
@@ -41,20 +40,13 @@ export function AuthCallback() {
         });
         const body = (await response.json()) as TokenResponse;
 
-        if (!response.ok || !body.accessToken) {
+        if (!response.ok || !body.ok) {
           setMessage(body.message ?? "The account signal was rejected.");
           return;
         }
 
-        window.localStorage.setItem(siteConfig.accessTokenStorageKey, body.accessToken);
-        if (body.idToken) {
-          window.localStorage.setItem(siteConfig.idTokenStorageKey, body.idToken);
-        }
-        if (body.expiresIn) {
-          window.localStorage.setItem(siteConfig.tokenExpiryStorageKey, String(Date.now() + body.expiresIn * 1000 - 60_000));
-        }
-        window.localStorage.removeItem(siteConfig.oauthStateStorageKey);
-        window.localStorage.removeItem(siteConfig.pkceVerifierStorageKey);
+        window.sessionStorage.removeItem(siteConfig.oauthStateStorageKey);
+        window.sessionStorage.removeItem(siteConfig.pkceVerifierStorageKey);
         router.replace("/account");
       } catch {
         setMessage("The account relay failed to answer.");
