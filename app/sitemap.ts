@@ -3,7 +3,7 @@ import { siteConfig } from "@/lib/site";
 import { transmissions } from "@/lib/transmissions";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const staticRoutes = ["", "/credits", "/beta", "/account", "/transmissions", "/privacy", "/terms", "/safety"];
+  const staticRoutes = ["", "/credits", "/beta", "/download", "/account", "/transmissions", "/privacy", "/terms", "/safety"];
   return [
     ...staticRoutes.map((route) => ({ url: `${siteConfig.url}${route}`, lastModified: new Date("2026-06-26") })),
     ...transmissions.map((post) => ({

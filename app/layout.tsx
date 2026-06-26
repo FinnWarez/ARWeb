@@ -39,6 +39,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
               <div className="hidden items-center gap-7 text-sm text-signal-fog/78 md:flex">
                 <Link href="/credits">Credits</Link>
                 <Link href="/beta">Beta</Link>
+                <Link href="/download">Download</Link>
                 <Link href="/transmissions">Transmissions</Link>
                 <Link href="/account">Account</Link>
               </div>

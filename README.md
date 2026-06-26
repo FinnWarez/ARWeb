@@ -26,3 +26,9 @@ The website can render without backend secrets. Public form and donation routes 
 - `ASCENT_WEBSITE_API_TOKEN`: optional server-side token for ARWeb-to-backend requests.
 - `ASCENT_APPSYNC_GRAPHQL_ENDPOINT`: server-side AppSync endpoint used for signed-in credit checkout.
 - `NEXT_PUBLIC_ASCENT_APPSYNC_GRAPHQL_ENDPOINT`: non-secret fallback for Amplify environments that do not expose server-only variables to Next route runtime.
+
+## Android Download Page
+
+The canonical public app destination is `/download`. Existing website calls to action read `NEXT_PUBLIC_APP_DOWNLOAD_URL`, which should stay `/download` unless a temporary external download destination is needed.
+
+The page renders from `public/download/android-latest.json`. The Android release workflow in `Finn-Warez/ar-social-game` updates this manifest when a signed APK is published to GitHub Releases. ARWeb stores only release metadata and the GitHub asset URL; APK binaries do not belong in this repository.
