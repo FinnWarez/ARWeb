@@ -1,7 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
-import { AlertTriangle, Download, FileCheck2, Github, ShieldCheck, Smartphone } from "lucide-react";
-import { androidRequirement, formatDownloadDate, getAndroidDownload } from "@/lib/download";
+import { AlertTriangle, FileCheck2, ShieldCheck, Smartphone } from "lucide-react";
+import { AndroidDownloadButton } from "@/components/android-download-button";
+import { androidRequirement, formatBytes, formatDownloadDate, getAndroidDownload } from "@/lib/download";
 
 export const metadata = {
   title: "Download Android",
@@ -44,12 +45,7 @@ export default function DownloadPage() {
             </p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
               {android.available ? (
-                <a
-                  href={android.apkUrl}
-                  className="inline-flex items-center justify-center gap-2 bg-signal-fog px-5 py-3 font-semibold text-signal-black transition hover:bg-white"
-                >
-                  Download APK <Download size={18} />
-                </a>
+                <AndroidDownloadButton downloadApiPath={android.downloadApiPath} />
               ) : (
                 <span className="inline-flex items-center justify-center gap-2 border border-white/18 px-5 py-3 font-semibold text-signal-fog/58">
                   Download pending <AlertTriangle size={18} />
@@ -72,29 +68,19 @@ export default function DownloadPage() {
           {android.available ? (
             <>
               <p className="mt-4 leading-7 text-signal-fog/72">
-                Version {android.versionName} is published from the Ascent Android GitHub release channel. Android may ask you to approve installs from your browser before opening the APK.
+                Version {android.versionName} is available through the signed-in Ascent account boundary. Android may ask you to approve installs from your browser before opening the APK.
               </p>
               <div className="mt-6">
                 <Detail label="Version code" value={String(android.versionCode)} />
                 <Detail label="Published" value={formatDownloadDate(android.publishedAt)} />
                 <Detail label="Device support" value={androidRequirement(android.minSdk)} />
+                <Detail label="APK size" value={formatBytes(android.apkBytes)} />
                 <Detail label="Release tag" value={android.tag} />
                 <Detail label="Commit" value={android.shortCommitSha} />
                 <Detail label="APK SHA-256" value={android.apkSha256} />
               </div>
               <div className="mt-7 flex flex-wrap gap-3">
-                <a
-                  href={android.apkUrl}
-                  className="inline-flex items-center gap-2 bg-signal-fog px-4 py-3 text-sm font-semibold text-signal-black transition hover:bg-white"
-                >
-                  Download APK <Download size={17} />
-                </a>
-                <a
-                  href={android.releaseNotesUrl}
-                  className="inline-flex items-center gap-2 border border-white/18 px-4 py-3 text-sm font-semibold text-signal-fog transition hover:border-signal-glass"
-                >
-                  Release notes <Github size={17} />
-                </a>
+                <AndroidDownloadButton downloadApiPath={android.downloadApiPath} compact />
               </div>
             </>
           ) : (
@@ -117,7 +103,7 @@ export default function DownloadPage() {
           </div>
           <h2 className="font-display text-3xl text-white">Install boundary</h2>
           <p className="mt-4 leading-7 text-signal-fog/72">
-            Use the download link on this page or the matching GitHub release. Do not install forwarded APK files, edited packages, or builds without a matching checksum.
+            Use the account-generated link on this page. Links expire after a short window; do not install forwarded APK files, edited packages, or builds without a matching checksum.
           </p>
           <p className="mt-4 leading-7 text-signal-fog/72">
             The app uses the same Cognito-backed account as the website. Your public Ascent identity remains pseudonymous inside the app.

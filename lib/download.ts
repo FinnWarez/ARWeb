@@ -6,11 +6,12 @@ type AndroidDownloadManifest = {
   versionCode?: number;
   tag?: string;
   commitSha?: string;
-  apkUrl?: string;
   apkSha256?: string;
+  apkBytes?: number;
   publishedAt?: string;
   minSdk?: number;
-  releaseNotesUrl?: string;
+  downloadRequiresAccount?: boolean;
+  downloadApiPath?: string;
 };
 
 export type AndroidDownload =
@@ -21,11 +22,12 @@ export type AndroidDownload =
       tag: string;
       commitSha: string;
       shortCommitSha: string;
-      apkUrl: string;
       apkSha256: string;
+      apkBytes: number;
       publishedAt: string;
       minSdk: number;
-      releaseNotesUrl: string;
+      downloadRequiresAccount: true;
+      downloadApiPath: string;
     }
   | {
       available: false;
@@ -36,20 +38,12 @@ function hasText(value: unknown): value is string {
   return typeof value === "string" && value.trim().length > 0;
 }
 
-function isHttpsUrl(value: unknown): value is string {
-  if (!hasText(value)) {
-    return false;
-  }
-
-  try {
-    return new URL(value).protocol === "https:";
-  } catch {
-    return false;
-  }
-}
-
 function isPositiveInteger(value: unknown): value is number {
   return Number.isInteger(value) && Number(value) > 0;
+}
+
+function isLocalApiPath(value: unknown): value is string {
+  return value === "/api/download/android";
 }
 
 export function androidRequirement(minSdk: number): string {
@@ -68,6 +62,13 @@ export function formatDownloadDate(value: string): string {
   }).format(new Date(value));
 }
 
+export function formatBytes(value: number): string {
+  return new Intl.NumberFormat("en", {
+    maximumFractionDigits: 1,
+    minimumFractionDigits: 0,
+  }).format(value / (1024 * 1024)) + " MB";
+}
+
 export function getAndroidDownload(): AndroidDownload {
   const manifest = androidDownloadManifest as AndroidDownloadManifest;
 
@@ -79,23 +80,25 @@ export function getAndroidDownload(): AndroidDownload {
   const versionCode = manifest.versionCode;
   const tag = manifest.tag;
   const commitSha = manifest.commitSha;
-  const apkUrl = manifest.apkUrl;
   const apkSha256 = manifest.apkSha256;
+  const apkBytes = manifest.apkBytes;
   const publishedAt = manifest.publishedAt;
   const minSdk = manifest.minSdk;
-  const releaseNotesUrl = manifest.releaseNotesUrl;
+  const downloadRequiresAccount = manifest.downloadRequiresAccount;
+  const downloadApiPath = manifest.downloadApiPath;
 
   if (
     !hasText(versionName) ||
     !isPositiveInteger(versionCode) ||
     !hasText(tag) ||
     !hasText(commitSha) ||
-    !isHttpsUrl(apkUrl) ||
     !hasText(apkSha256) ||
+    !isPositiveInteger(apkBytes) ||
     !hasText(publishedAt) ||
     Number.isNaN(Date.parse(publishedAt)) ||
     !isPositiveInteger(minSdk) ||
-    !isHttpsUrl(releaseNotesUrl)
+    downloadRequiresAccount !== true ||
+    !isLocalApiPath(downloadApiPath)
   ) {
     return { available: false, reason: "The Android beta download metadata is incomplete." };
   }
@@ -107,10 +110,11 @@ export function getAndroidDownload(): AndroidDownload {
     tag,
     commitSha,
     shortCommitSha: commitSha.slice(0, 7),
-    apkUrl,
     apkSha256,
+    apkBytes,
     publishedAt,
     minSdk,
-    releaseNotesUrl,
+    downloadRequiresAccount,
+    downloadApiPath,
   };
 }

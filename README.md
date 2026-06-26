@@ -31,4 +31,8 @@ The website can render without backend secrets. Public form and donation routes 
 
 The canonical public app destination is `/download`. Existing website calls to action read `NEXT_PUBLIC_APP_DOWNLOAD_URL`, which should stay `/download` unless a temporary external download destination is needed.
 
-The page renders from `public/download/android-latest.json`. The Android release workflow in `Finn-Warez/ar-social-game` updates this manifest when a signed APK is published to GitHub Releases. ARWeb stores only release metadata and the GitHub asset URL; APK binaries do not belong in this repository.
+The page renders from `public/download/android-latest.json`. The Android release workflow in `Finn-Warez/ar-social-game` updates this manifest after uploading the signed APK, checksum, and private latest manifest to the private S3 bucket owned by `DecentReleaseAssets-<stage>`.
+
+ARWeb stores only public metadata: version, tag, commit, checksum, size, publish time, minimum SDK, and the exact local API path `/api/download/android`. It must not store APK binaries, private S3 keys, CloudFront private keys, or permanent APK URLs.
+
+`POST /api/download/android` requires a same-origin request plus the existing HttpOnly Cognito access-token cookie, calls the AppSync mutation `createAndroidDownloadLink`, and returns a short-lived signed CloudFront URL. Signed-out users are directed to `/account` before the link is minted.

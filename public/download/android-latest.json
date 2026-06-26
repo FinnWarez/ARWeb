@@ -4,9 +4,10 @@
   "versionCode": 0,
   "tag": "",
   "commitSha": "",
-  "apkUrl": "",
   "apkSha256": "",
+  "apkBytes": 0,
   "publishedAt": "",
   "minSdk": 33,
-  "releaseNotesUrl": ""
+  "downloadRequiresAccount": true,
+  "downloadApiPath": "/api/download/android"
 }
