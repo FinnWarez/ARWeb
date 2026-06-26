@@ -77,7 +77,7 @@ export function AccountActions() {
                 type="button"
                 onClick={register}
                 disabled={Boolean(pending) || !hasAuthConfig()}
-                className="inline-flex items-center gap-2 bg-white/92 px-4 py-3 text-sm font-semibold text-signal-black transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60"
+                className="inline-flex items-center gap-2 border border-white/20 px-4 py-3 text-sm font-semibold text-white transition hover:border-white/45 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {pending === "register" ? <Loader2 size={16} className="animate-spin" /> : <UserPlus size={16} />}
                 Create account
