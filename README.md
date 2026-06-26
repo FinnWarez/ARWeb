@@ -24,5 +24,7 @@ The website can render without backend secrets. Public form and donation routes 
 - `NEXT_PUBLIC_ASCENT_PKCE_VERIFIER_STORAGE_KEY`: browser storage key for the transient PKCE verifier.
 - `NEXT_PUBLIC_ASCENT_OAUTH_STATE_STORAGE_KEY`: browser storage key for the transient OAuth state value.
 - `ASCENT_WEBSITE_API_URL`: server-side Ascent backend website/payment API base URL.
+- `NEXT_PUBLIC_ASCENT_WEBSITE_API_URL`: non-secret fallback for Amplify environments that do not expose server-only variables to Next route runtime.
 - `ASCENT_WEBSITE_API_TOKEN`: optional server-side token for ARWeb-to-backend requests.
 - `ASCENT_APPSYNC_GRAPHQL_ENDPOINT`: server-side AppSync endpoint used for signed-in credit checkout.
+- `NEXT_PUBLIC_ASCENT_APPSYNC_GRAPHQL_ENDPOINT`: non-secret fallback for Amplify environments that do not expose server-only variables to Next route runtime.

@@ -9,7 +9,7 @@ type GraphQlResponse<T> = {
 };
 
 export async function proxyToAscentBackend(path: string, payload: unknown): Promise<ProxyResult> {
-  const baseUrl = process.env.ASCENT_WEBSITE_API_URL;
+  const baseUrl = process.env.ASCENT_WEBSITE_API_URL || process.env.NEXT_PUBLIC_ASCENT_WEBSITE_API_URL;
   if (!baseUrl) {
     return {
       status: 503,
@@ -48,7 +48,8 @@ export async function proxyToAscentAppSync<T>(
   variables: Record<string, unknown>,
 ): Promise<ProxyResult> {
   const endpoint = process.env.ASCENT_APPSYNC_GRAPHQL_ENDPOINT;
-  if (!endpoint) {
+  const publicEndpoint = process.env.NEXT_PUBLIC_ASCENT_APPSYNC_GRAPHQL_ENDPOINT;
+  if (!endpoint && !publicEndpoint) {
     return {
       status: 503,
       body: {
@@ -58,7 +59,7 @@ export async function proxyToAscentAppSync<T>(
     };
   }
 
-  const response = await fetch(endpoint, {
+  const response = await fetch(endpoint || publicEndpoint!, {
     method: "POST",
     headers: {
       "content-type": "application/json",
