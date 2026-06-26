@@ -31,7 +31,7 @@ export function hasAuthConfig() {
   return Boolean(cognitoBaseUrl() && siteConfig.cognitoUserPoolClientId);
 }
 
-export async function beginCognitoSignIn() {
+async function beginCognitoAuth(entryPath: "/oauth2/authorize" | "/signup") {
   const baseUrl = cognitoBaseUrl();
   if (!baseUrl || !siteConfig.cognitoUserPoolClientId) {
     throw new Error("Account relay is not configured yet.");
@@ -53,7 +53,15 @@ export async function beginCognitoSignIn() {
     code_challenge_method: "S256",
     state,
   });
-  window.location.href = `${baseUrl}/oauth2/authorize?${params.toString()}`;
+  window.location.href = `${baseUrl}${entryPath}?${params.toString()}`;
+}
+
+export async function beginCognitoSignIn() {
+  await beginCognitoAuth("/oauth2/authorize");
+}
+
+export async function beginCognitoRegistration() {
+  await beginCognitoAuth("/signup");
 }
 
 export function clearStoredAuth() {
