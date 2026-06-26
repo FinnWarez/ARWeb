@@ -3,10 +3,10 @@
   "versionName": "0.1.0",
   "versionCode": 1,
   "tag": "android-v0.1.0",
-  "commitSha": "e74b11cf54a10e71e4e91c97878d6ad30d4b3aa5",
-  "apkSha256": "95fb9d31a8197be028a4584e2d516cfe98dda65af8e6c46ca1b307c39c3d822c",
+  "commitSha": "65f2185a7b2bc4796ce834d03b730b18464b69a9",
+  "apkSha256": "5d086eed19f149f83051f3d5e775118947d02bb97be9c26fc1a491ba254fac7c",
   "apkBytes": 403920861,
-  "publishedAt": "2026-06-26T10:46:52Z",
+  "publishedAt": "2026-06-26T11:35:06Z",
   "minSdk": 33,
   "downloadRequiresAccount": true,
   "downloadApiPath": "/api/download/android"
