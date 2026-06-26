@@ -37,6 +37,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
                 ASCENT
               </Link>
               <div className="hidden items-center gap-7 text-sm text-signal-fog/78 md:flex">
+                <Link href="/signals">Signals</Link>
                 <Link href="/credits">Credits</Link>
                 <Link href="/beta">Beta</Link>
                 <Link href="/download">Download</Link>
