@@ -11,7 +11,7 @@ import {
   Sparkles,
   SquareTerminal,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { AccountActions } from "@/components/account-actions";
 import {
   GeneratedTextAdventureSession,
@@ -50,7 +50,7 @@ export function SignalStream() {
   const [message, setMessage] = useState<string | null>(null);
   const [needsAccount, setNeedsAccount] = useState(false);
 
-  async function refreshStream(options: { quiet?: boolean } = {}) {
+  const loadStream = useCallback(async (options: { quiet?: boolean } = {}) => {
     if (!options.quiet) {
       setLoading(true);
       setMessage(null);
@@ -69,16 +69,18 @@ export function SignalStream() {
       }
       setStream(body.stream);
       setNeedsAccount(false);
+      return body.stream;
     } catch {
       setMessage("The Signal Stream relay failed to answer.");
+      return null;
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
 
-  async function requestSignal() {
+  const requestSignal = useCallback(async (options: { quiet?: boolean } = {}) => {
     setGenerating(true);
-    setMessage(null);
+    if (!options.quiet) setMessage(null);
     try {
       const response = await fetch("/api/signals/generate", {
         method: "POST",
@@ -93,13 +95,24 @@ export function SignalStream() {
       if (body.request.status === "QUEUED" || body.request.status === "GENERATING") {
         await pollGeneration(body.request.generationRequestId);
       }
-      await refreshStream({ quiet: true });
+      const refreshed = await loadStream({ quiet: true });
+      if (!refreshed?.cards.length) {
+        setMessage("No active Signal was returned yet. The backend may still be generating or approval may have failed.");
+      }
     } catch {
       setMessage("A new Signal could not be requested.");
     } finally {
       setGenerating(false);
     }
-  }
+  }, [loadStream]);
+
+  const refreshStream = useCallback(async (options: { quiet?: boolean; topUpIfEmpty?: boolean } = {}) => {
+    const loaded = await loadStream(options);
+    if (options.topUpIfEmpty && loaded?.cards.length === 0) {
+      await requestSignal({ quiet: true });
+    }
+    return loaded;
+  }, [loadStream, requestSignal]);
 
   async function startMission(card: SignalCard) {
     if (!card.playableOnWeb) return;
@@ -175,8 +188,8 @@ export function SignalStream() {
   }
 
   useEffect(() => {
-    refreshStream();
-  }, []);
+    void refreshStream({ topUpIfEmpty: true });
+  }, [refreshStream]);
 
   const progression = stream?.progression;
   const account = stream?.account;
@@ -210,7 +223,7 @@ export function SignalStream() {
         <div className="flex flex-wrap gap-3">
           <button
             type="button"
-            onClick={() => refreshStream()}
+            onClick={() => refreshStream({ topUpIfEmpty: true })}
             disabled={loading || generating || advancing}
             className="inline-flex items-center gap-2 border border-white/20 px-4 py-3 text-sm font-semibold text-white transition hover:border-white/45 disabled:cursor-wait disabled:opacity-60"
           >
@@ -219,7 +232,7 @@ export function SignalStream() {
           </button>
           <button
             type="button"
-            onClick={requestSignal}
+            onClick={() => requestSignal()}
             disabled={loading || generating || advancing}
             className="inline-flex items-center gap-2 bg-white/92 px-4 py-3 text-sm font-semibold text-signal-black transition hover:bg-white disabled:cursor-wait disabled:opacity-70"
           >
